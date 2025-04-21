@@ -1,2 +1,0 @@
-# gosdk
-mediana go sdk
