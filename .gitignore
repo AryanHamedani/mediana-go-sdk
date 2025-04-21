@@ -1,0 +1,9 @@
+*.log
+*.out
+bin/
+.idea/
+*.iml
+*.swp
+*.swp
+.DS_Store
+.env
