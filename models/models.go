@@ -38,3 +38,23 @@ type OTPResponse struct {
 	Status    string `json:"status"`
 	MessageID string `json:"messageId"`
 }
+
+// DeliveryStatusResponse represents the response from checking message delivery status
+type DeliveryStatusResponse struct {
+	Meta struct {
+		Code         string   `json:"code"`
+		ErrorMessage string   `json:"errorMessage,omitempty"`
+		Errors       []string `json:"errors,omitempty"`
+	} `json:"meta"`
+	Data struct {
+		Status   string        `json:"status"`
+		SmsItems []SmsItemInfo `json:"smsItems"`
+	} `json:"data"`
+}
+
+// SmsItemInfo represents information about a single SMS item in a delivery status response
+type SmsItemInfo struct {
+	SmsItemId string `json:"smsItemId"`
+	Recipient string `json:"recipient"`
+	Status    string `json:"status"`
+}
