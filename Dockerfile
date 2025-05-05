@@ -7,7 +7,10 @@ RUN apk add --no-cache git
 
 # Copy go mod files
 COPY go.mod ./
-RUN go mod download
+
+# Disable IPv6 for go mod download to avoid "cannot assign requested address" errors
+# See: https://groups.google.com/g/golang-nuts/c/KFZOOUeiYpc
+RUN GODEBUG=netdns=cgo go mod download
 
 # Copy source code
 COPY . .

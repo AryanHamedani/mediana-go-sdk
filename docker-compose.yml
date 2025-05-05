@@ -9,6 +9,8 @@ services:
       - .env
     volumes:
       - .:/app
+    environment:
+      - GODEBUG=netdns=cgo
     command: sh -c "cd examples && go run main.go"
 
 # To run:
