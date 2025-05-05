@@ -282,17 +282,9 @@ func printDetailedError(err error) {
 		fmt.Printf("  - Status Code: %d\n", apiErr.StatusCode)
 		fmt.Printf("  - Error: %s\n", apiErr.Error())
 		
-		// If there's a raw response body, print it
-		if apiErr.RawBody != "" {
-			fmt.Printf("  - Response Body: %s\n", apiErr.RawBody)
-		}
-		
 		// If there are specific API error details, print them
 		if apiErr.Message != "" {
 			fmt.Printf("  - Message: %s\n", apiErr.Message)
-		}
-		if apiErr.Code != "" {
-			fmt.Printf("  - Code: %s\n", apiErr.Code)
 		}
 		return
 	}
