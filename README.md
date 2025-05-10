@@ -1,22 +1,85 @@
 # Mediana Go SDK
 
-Go SDK for the Mediana SMS API, providing services for sending SMS messages, including OTP, standard SMS, and pattern-based SMS.
+Go SDK for the Mediana.ir SMS API, providing services for sending SMS messages, including OTP, standard SMS, and pattern-based SMS.
 
 ## Installation
 
 ```bash
-go get github.com/AryanHamedani/mediana-go-sdk@v1.0.0
+go get github.com/AryanHamedani/mediana-go-sdk
 ```
 
 ## Usage
 
-### Basic setup
+### Initialization
 
 ```go
 import "github.com/AryanHamedani/mediana-go-sdk/client"
 
-// Create a new client with your API key
-c := client.New("YOUR_API_KEY")
+apiKey := "your-api-key"
+c := client.New(apiKey)
+
+// With custom options
+c := client.New(apiKey,
+    client.WithBaseURL("https://custom.api.url"),
+    client.WithHTTPClient(&http.Client{Timeout: 10 * time.Second}),
+)
+```
+
+### Sending SMS
+
+```go
+resp, err := c.SendSMS(context.Background(), models.SMSRequest{
+    SendingNumber: "3000",
+    Recipients:    []string{"09123456789"},
+    MessageText:   "Your message here",
+})
+```
+
+### Sending Pattern SMS
+
+```go
+resp, err := c.SendPatternSMS(context.Background(), models.PatternRequest{
+    Recipients:  []string{"09123456789"},
+    PatternCode: "welcome_pattern",
+    Parameters: map[string]string{
+        "name": "John",
+        "code": "1234",
+    },
+})
+```
+
+### Sending OTP
+
+```go
+resp, err := c.SendOTP(context.Background(), models.OTPRequest{
+    PatternCode: "otp_pattern",
+    Recipient:   "09123456789",
+    OTPCode:     "12345",
+})
+```
+
+### Check Delivery Status
+
+```go
+resp, err := c.GetDeliveryStatus(context.Background(), requestID)
+```
+
+## Error Handling
+
+All API errors are returned as `*errors.APIError` which includes:
+
+- StatusCode: HTTP status code
+- Message: Error message from API
+- Details: Additional error details
+
+```go
+if err != nil {
+    if apiErr, ok := err.(*errors.APIError); ok {
+        log.Printf("API Error (%d): %s", apiErr.StatusCode, apiErr.Message)
+    } else {
+        log.Printf("Other error: %v", err)
+    }
+}
 ```
 
 ## Testing the SDK
@@ -94,47 +157,6 @@ Alternatively, you can provide environment variables directly:
 docker run -e MEDIANA_API_KEY=your_key -e MEDIANA_TEST_PHONE=09XXXXXXXXX mediana-sdk
 ```
 
-## Available Functions
+## Examples
 
-### Send Regular SMS
-
-```go
-resp, err := client.SendSMS(ctx, models.SMSRequest{
-    SendingNumber: "3000",
-    Recipients:    []string{"09XXXXXXXXX"},
-    MessageText:   "Your message here",
-})
-```
-
-### Send Pattern SMS
-
-```go
-resp, err := client.SendPatternSMS(ctx, models.PatternRequest{
-    Recipients:  []string{"09XXXXXXXXX"},
-    PatternCode: "your_pattern_code",
-    Parameters: map[string]string{
-        "param1": "value1",
-        "param2": "value2",
-    },
-})
-```
-
-### Send OTP
-
-```go
-resp, err := client.SendOTP(ctx, models.OTPRequest{
-    PatternCode: "your_otp_pattern",
-    Recipient:   "09XXXXXXXXX",
-    OTPCode:     "123456",
-})
-```
-
-### Check Delivery Status
-
-```go
-resp, err := client.GetDeliveryStatus(ctx, requestID)
-```
-
-## Error Handling
-
-The SDK provides detailed error information through the returned error values. Check the error response for specific error codes from the Mediana API.
+See the [examples](examples/) directory for complete usage examples.
