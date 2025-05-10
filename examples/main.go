@@ -9,9 +9,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/AryanHamedani/gosdk/client"
-	"github.com/AryanHamedani/gosdk/errors"
-	"github.com/AryanHamedani/gosdk/models"
+	"github.com/AryanHamedani/mediana-go-sdk/client"
+	"github.com/AryanHamedani/mediana-go-sdk/errors"
+	"github.com/AryanHamedani/mediana-go-sdk/models"
 )
 
 func main() {
@@ -115,17 +115,17 @@ func main() {
 	if err == nil && otpID != "" {
 		requestIDs = append(requestIDs, otpID)
 	}
-	
+
 	// Wait a bit for messages to be processed
 	if len(requestIDs) > 0 {
 		fmt.Println("\n⏳ Waiting 10 seconds for message processing...")
 		time.Sleep(10 * time.Second)
-		
+
 		// Example 4: Check delivery status
 		fmt.Println("\n📊 Example 4: Checking delivery status...")
 		// You'll need to use an actual request ID here for real testing
 		checkDeliveryStatus(c, 123456) // Default test ID
-		
+
 		// If we have actual request IDs from this run, check those as well
 		for i, id := range requestIDs {
 			if id != "" {
@@ -147,7 +147,7 @@ func sendRegularSMS(c *client.Client, phoneNumber, sendingNumber string) (string
 		Recipients:    []string{phoneNumber},
 		MessageText:   "Hello! This is a test message from Mediana Go SDK.",
 	}
-	
+
 	reqJSON, _ := json.MarshalIndent(req, "", "  ")
 	fmt.Printf("📤 Request:\n%s\n", string(reqJSON))
 
@@ -162,9 +162,9 @@ func sendRegularSMS(c *client.Client, phoneNumber, sendingNumber string) (string
 	// Print full response
 	respJSON, _ := json.MarshalIndent(resp, "", "  ")
 	fmt.Printf("📥 Response:\n%s\n", string(respJSON))
-	
+
 	fmt.Printf("✅ SMS sent successfully: Status=%s\n", resp.Status)
-	
+
 	// Return the first message ID if available
 	if len(resp.MessageIDs) > 0 {
 		fmt.Printf("📝 Message ID: %s\n", resp.MessageIDs[0])
@@ -186,7 +186,7 @@ func sendPatternSMS(c *client.Client, phoneNumber, patternCode string) (string, 
 			// Add other parameters required by your pattern
 		},
 	}
-	
+
 	reqJSON, _ := json.MarshalIndent(req, "", "  ")
 	fmt.Printf("📤 Request:\n%s\n", string(reqJSON))
 
@@ -201,9 +201,9 @@ func sendPatternSMS(c *client.Client, phoneNumber, patternCode string) (string, 
 	// Print full response
 	respJSON, _ := json.MarshalIndent(resp, "", "  ")
 	fmt.Printf("📥 Response:\n%s\n", string(respJSON))
-	
+
 	fmt.Printf("✅ Pattern SMS sent successfully: Status=%s\n", resp.Status)
-	
+
 	// Return the first message ID if available
 	if len(resp.MessageIDs) > 0 {
 		fmt.Printf("📝 Message ID: %s\n", resp.MessageIDs[0])
@@ -217,14 +217,14 @@ func sendOTP(c *client.Client, phoneNumber, otpPattern string) (string, error) {
 
 	// Generate a random OTP code (in real scenarios, you would generate this securely)
 	otpCode := "123456"
-	
+
 	// Print request details
 	req := models.OTPRequest{
 		PatternCode: otpPattern,
 		Recipient:   phoneNumber,
 		OTPCode:     otpCode,
 	}
-	
+
 	reqJSON, _ := json.MarshalIndent(req, "", "  ")
 	fmt.Printf("📤 Request:\n%s\n", string(reqJSON))
 
@@ -239,9 +239,9 @@ func sendOTP(c *client.Client, phoneNumber, otpPattern string) (string, error) {
 	// Print full response
 	respJSON, _ := json.MarshalIndent(resp, "", "  ")
 	fmt.Printf("📥 Response:\n%s\n", string(respJSON))
-	
+
 	fmt.Printf("✅ OTP sent successfully: Status=%s, OTP Code=%s\n", resp.Status, otpCode)
-	
+
 	// Return the message ID if available
 	if resp.MessageID != "" {
 		fmt.Printf("📝 Message ID: %s\n", resp.MessageID)
@@ -266,11 +266,11 @@ func checkDeliveryStatus(c *client.Client, requestID int) {
 	// Print full response
 	respJSON, _ := json.MarshalIndent(resp, "", "  ")
 	fmt.Printf("📥 Response:\n%s\n", string(respJSON))
-	
+
 	fmt.Printf("✅ Delivery status: %s\n", resp.Data.Status)
 	fmt.Println("📱 SMS Items:")
 	for _, item := range resp.Data.SmsItems {
-		fmt.Printf("  - ID: %s, Recipient: %s, Status: %s\n", 
+		fmt.Printf("  - ID: %s, Recipient: %s, Status: %s\n",
 			item.SmsItemId, item.Recipient, item.Status)
 	}
 }
@@ -281,14 +281,14 @@ func printDetailedError(err error) {
 		fmt.Printf("🔍 API Error Details:\n")
 		fmt.Printf("  - Status Code: %d\n", apiErr.StatusCode)
 		fmt.Printf("  - Error: %s\n", apiErr.Error())
-		
+
 		// If there are specific API error details, print them
 		if apiErr.Message != "" {
 			fmt.Printf("  - Message: %s\n", apiErr.Message)
 		}
 		return
 	}
-	
+
 	// For other error types, just print the error
 	fmt.Printf("🔍 Error Details: %v\n", err)
 }
