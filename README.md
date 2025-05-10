@@ -5,7 +5,7 @@ Go SDK for the Mediana SMS API, providing services for sending SMS messages, inc
 ## Installation
 
 ```bash
-go get github.com/AryanHamedani/mediana-go-sdk
+go get github.com/AryanHamedani/mediana-go-sdk@v1.0.0
 ```
 
 ## Usage
