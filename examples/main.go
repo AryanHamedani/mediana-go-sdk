@@ -9,9 +9,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/mediana-ir/gosdk/client"
-	"github.com/mediana-ir/gosdk/errors"
-	"github.com/mediana-ir/gosdk/models"
+	"github.com/AryanHamedani/gosdk/client"
+	"github.com/AryanHamedani/gosdk/errors"
+	"github.com/AryanHamedani/gosdk/models"
 )
 
 func main() {

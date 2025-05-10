@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/mediana-ir/gosdk/errors"
+	"github.com/AryanHamedani/gosdk/errors"
 )
 
 const (
