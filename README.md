@@ -5,7 +5,7 @@ Go SDK for the Mediana SMS API, providing services for sending SMS messages, inc
 ## Installation
 
 ```bash
-go get github.com/AryanHamedani/gosdk
+go get github.com/AryanHamedani/mediana-go-sdk
 ```
 
 ## Usage
@@ -13,7 +13,7 @@ go get github.com/AryanHamedani/gosdk
 ### Basic setup
 
 ```go
-import "github.com/AryanHamedani/gosdk/client"
+import "github.com/AryanHamedani/mediana-go-sdk/client"
 
 // Create a new client with your API key
 c := client.New("YOUR_API_KEY")

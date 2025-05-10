@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/AryanHamedani/gosdk/models"
+	"github.com/AryanHamedani/mediana-go-sdk/models"
 )
 
 func (c *Client) SendSMS(ctx context.Context, req models.SMSRequest) (*models.SMSResponse, error) {
