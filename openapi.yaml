@@ -1,0 +1,845 @@
+
+openapi: 3.0.0
+info:
+  title: Mediana Customer SMS API 
+  description: |
+    Mediana SMS API provides services for sending SMS messages, including OTP, standard SMS, and pattern-based SMS.
+    
+    ## Authentication
+    - API Key authentication is required
+    - Include the API key in the Authorization header as: `Bearer YOUR_API_KEY`
+    
+    ## Error Codes
+    | Error Code | Description |
+    | --- | --- |
+    | 1032 | No active plan found |
+    | 1033 | Plan does not have API facility |
+    | 1034 | Plan does not have pattern facility |
+    | 1035 | Plan does not have a dedicated line facility |
+    | 1041 | Invalid receiver in API request |
+    | 1042 | Insufficient wallet balance |
+    | 1043 | Maximum number of receivers exceeded |
+    | 1044 | Invalid SMS ID |
+    | 1045 | Invalid request code |
+    | 1046 | Invalid input parameters |
+    | 1047 | Phone number is blacklisted |
+    | 1048 | WebEngage is not enabled |
+    | 1051 | Campaign has expired |
+    | 1061 | No active line found |
+    | 1062 | Line is not usable at this time of day |
+    | 1071 | Pattern URL detected |
+    | 1072 | Pattern rejected by admin |
+    | 1073 | Pattern belongs to another sending number |
+    | 1074 | Message text is empty |
+    | 1075 | Message request not found |
+    | 1076 | Pattern is empty |
+    | 1081 | Postal code not verified |
+    | 1082 | National code not verified |
+    | 1083 | Mobile number not verified |
+    | 1084 | Profile not completed |
+    | 1093 | Receivers not found |
+    | 1101 | Sending number not found |
+    | 1102 | Sending number has expired |
+    | 1021 | Unknown error occurred |
+  version: "1.0.0"
+servers:
+  - url: https://api.mediana.ir/sms/v1
+paths:
+  /send/otp:
+    post:
+      summary: Send OTP
+      description: Send an OTP message to a recipient
+      operationId: sendOtp
+      # parameters:
+      #   - name: patterncode
+      #     in: query
+      #     description: An required query parameter
+      #     required: true
+      #     schema:
+      #       type: string
+      #   - name: recipient
+      #     in: query
+      #     description: A required query parameter
+      #     required: true
+      #     schema:
+      #       type: string
+      #   - name: otpCode
+      #     in: query
+      #     description: A required query parameter
+      #     required: true
+      #     schema:
+      #       type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                patternCode:
+                  type: string
+                recipient:
+                  type: string
+                otpCode:
+                  type: string
+               
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      errorMessage:
+                        type: string
+                        nullable: true
+                      errors:
+                        type: array
+                        items:
+                          type: string
+                  data:
+                    type: object
+                    properties:
+                      succeed:
+                        type: boolean
+                      requestCode:
+                        type: string
+                      message:
+                        type: string
+                      status:
+                        type: string
+                      smsItems:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            smsItemId:
+                              type: string
+                            recipient:
+                              type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      errorMessage:
+                        type: string
+                      errors:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                            errors:
+                              type: array
+                              items:
+                                type: string
+                            errorCode:
+                              type: integer
+                  data:
+                    type: object
+                    properties:
+                      succeed:
+                        type: boolean
+                      requestCode:
+                        type: string
+                      message:
+                        type: string
+                      status:
+                        type: string
+                      smsItems:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            smsItemId:
+                              type: string
+                            recipient:
+                              type: string
+  /send/sms option 1:
+    post:
+      summary: Send Normal SMS with type
+      description: Send a normal SMS message to recipients.with type informational(اطلاع رسانی) or PromotionalToCustomers(باشگاه مشتریان) or PromotionalAll(تبلیغات)
+      operationId: sendNormal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: [Informational, PromotionalToCustomers, PromotionalAll]
+                recipients:
+                  type: array
+                  items:
+                    type: string
+            
+                messageText:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      errorMessage:
+                        type: string
+                        nullable: true
+                      errors:
+                        type: array
+                        items:
+                          type: string
+                  data:
+                    type: object
+                    properties:
+                      succeed:
+                        type: boolean
+                      requestCode:
+                        type: string
+                      message:
+                        type: string
+                      status:
+                        type: string
+                      smsItems:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            smsItemId:
+                              type: string
+                            recipient:
+                              type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      errorMessage:
+                        type: string
+                      errors:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                            errors:
+                              type: array
+                              items:
+                                type: string
+                            errorCode:
+                              type: integer
+                  data:
+                    type: object
+                    properties:
+                      succeed:
+                        type: boolean
+                      requestCode:
+                        type: string
+                      message:
+                        type: string
+                      status:
+                        type: string
+                      smsItems:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            smsItemId:
+                              type: string
+                            recipient:
+                              type: string
+  /send/sms option 2:
+    post:
+      summary: Send Normal SMS with number
+      description: Send a normal SMS message to recipients with sending number
+      operationId: sendNormal2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sendingNumber:
+                  type: string
+                  enum: [string]
+                recipients:
+                  type: array
+                  items:
+                    type: string
+            
+                messageText:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      errorMessage:
+                        type: string
+                        nullable: true
+                      errors:
+                        type: array
+                        items:
+                          type: string
+                  data:
+                    type: object
+                    properties:
+                      succeed:
+                        type: boolean
+                      requestCode:
+                        type: string
+                      message:
+                        type: string
+                      status:
+                        type: string
+                      smsItems:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            smsItemId:
+                              type: string
+                            recipient:
+                              type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      errorMessage:
+                        type: string
+                      errors:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                            errors:
+                              type: array
+                              items:
+                                type: string
+                            errorCode:
+                              type: integer
+                  data:
+                    type: object
+                    properties:
+                      succeed:
+                        type: boolean
+                      requestCode:
+                        type: string
+                      message:
+                        type: string
+                      status:
+                        type: string
+                      smsItems:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            smsItemId:
+                              type: string
+                            recipient:
+                              type: string
+  
+  /send/pattern:
+    post:
+      summary: Send Pattern SMS
+      description: Send a pattern-based SMS message to recipients.
+      operationId: sendPattern
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipients:
+                  type: array
+                  items:
+                    type: string
+                patternCode:
+                  type: string
+                parameters:
+                  type: object
+                  additionalProperties:
+                    type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      errorMessage:
+                        type: string
+                        nullable: true
+                      errors:
+                        type: array
+                        items:
+                          type: string
+                  data:
+                    type: object
+                    properties:
+                      succeed:
+                        type: boolean
+                      requestCode:
+                        type: string
+                      message:
+                        type: string
+                      status:
+                        type: string
+                      smsItems:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            smsItemId:
+                              type: string
+                            recipient:
+                              type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      errorMessage:
+                        type: string
+                      errors:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                            errors:
+                              type: array
+                              items:
+                                type: string
+                            errorCode:
+                              type: integer
+                  data:
+                    type: object
+                    properties:
+                      succeed:
+                        type: boolean
+                      requestCode:
+                        type: string
+                      message:
+                        type: string
+                      status:
+                        type: string
+                      smsItems:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            smsItemId:
+                              type: string
+                            recipient:
+                              type: string
+  /get/pattern/{patternCode}:
+    get:
+      summary: Get Pattern Details
+      description: Retrieve details of a specific pattern.
+      operationId: getPatternDetail
+      parameters:
+        - name: patternCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      MessagePatternId:
+                        type: integer
+                      Title:
+                        type: string
+                      type:
+                        type: string
+                      IsUsable:
+                        type: boolean
+                      Code:
+                        type: string
+                      Description:
+                        type: string
+                      ThePattern:
+                        type: object
+                        properties:
+                          Pattern:
+                            type: string
+                          Status:
+                            type: string
+                          SendingNumber:
+                            type: string
+                          IsLockedBySendingNumber:
+                            type: boolean
+                          ApprovalDescription:
+                            type: string
+                          GetMessagePatternsByIdResponseField:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                FieldTitle:
+                                  type: string
+                                FieldKey:
+                                  type: string
+                                MaxCharacters:
+                                  type: integer
+                                FieldType:
+                                  type: string
+                      SettingInfo:
+                        type: object
+                        properties:
+                          Website:
+                            type: string
+                          AverageSendingCount:
+                            type: integer
+                      Patterns:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            Pattern:
+                              type: string
+                            Status:
+                              type: string
+                      CreateDate:
+                        type: string
+                        format: date-time
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      errorMessage:
+                        type: string
+                      errors:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                            errors:
+                              type: array
+                              items:
+                                type: string
+                            errorCode:
+                              type: integer
+  /send-requests/status/{requestId}:
+    get:
+      summary: Check Delivery Status
+      description: Check the delivery status of a message by request ID.
+      operationId: deliveryStatus
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                      smsItems:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            smsItemId:
+                              type: string
+                            recipient:
+                              type: string
+                            status:
+                              type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      errorMessage:
+                        type: string
+                      errors:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                            errors:
+                              type: array
+                              items:
+                                type: string
+                            errorCode:
+                              type: integer
+  /account/balance:
+    get:
+      summary: Get Account Balance
+      description: Retrieve the current balance of the account.
+      operationId: getBalance
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      Balance:
+                        type: integer
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      errorMessage:
+                        type: string
+                      errors:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                            errors:
+                              type: array
+                              items:
+                                type: string
+                            errorCode:
+                              type: integer
+  /account/lines:
+    get:
+      summary: Get Account Lines
+      description: Retrieve available sending lines for the account.
+      operationId: getLines
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      Number:
+                        type: string
+                      Description:
+                        type: string
+                      IsDedicated:
+                        type: boolean
+                      IsAdvertisement:
+                        type: boolean
+                      IsService:
+                        type: boolean
+                      UsableUntil:
+                        type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      errorMessage:
+                        type: string
+                      errors:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                            errors:
+                              type: array
+                              items:
+                                type: string
+                            errorCode:
+                              type: integer
+  /send-requests/inbox:
+    get:
+      summary: Get Inbox Messages
+      description: Retrieve messages from the inbox with specific status.
+      operationId: getInbox
+      parameters:
+        - name: Status
+          in: query
+          required: true
+          schema:
+            type: string
+            default: New
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      Id:
+                        type: string
+                      CreateDate:
+                        type: string
+                      status:
+                        type: string
+                      ReceiveId:
+                        type: integer
+                      SourceId:
+                        type: integer
+                      SourceAddress:
+                        type: string
+                      DestinationAddress:
+                        type: string
+                      MessageText:
+                        type: string
+                      ReceiveDateTime:
+                        type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      errorMessage:
+                        type: string
+                      errors:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                            errors:
+                              type: array
+                              items:
+                                type: string
+                            errorCode:
+                              type: integer
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
