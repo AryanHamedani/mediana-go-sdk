@@ -92,49 +92,66 @@ func main() {
 		fmt.Printf("Using OTP pattern code from command line: %s\n", otpPattern)
 	}
 
-	// Track request IDs for status checking
-	var requestIDs []string
+	// Track request codes for status checking
+	var requestCodes []string
 
 	// Example 1: Send regular SMS
 	fmt.Println("\n📱 Example 1: Sending regular SMS...")
-	smsID, err := sendRegularSMS(c, phoneNumber, sendingNumber)
-	if err == nil && smsID != "" {
-		requestIDs = append(requestIDs, smsID)
+	requestCode, err := sendRegularSMS(c, phoneNumber, sendingNumber)
+	if err == nil && requestCode != "" {
+		requestCodes = append(requestCodes, requestCode)
 	}
 
 	// Example 2: Send pattern SMS
 	fmt.Println("\n📊 Example 2: Sending pattern SMS...")
-	patternID, err := sendPatternSMS(c, phoneNumber, patternCode)
-	if err == nil && patternID != "" {
-		requestIDs = append(requestIDs, patternID)
+	patternReqCode, err := sendPatternSMS(c, phoneNumber, patternCode)
+	if err == nil && patternReqCode != "" {
+		requestCodes = append(requestCodes, patternReqCode)
 	}
 
 	// Example 3: Send OTP
 	fmt.Println("\n🔑 Example 3: Sending OTP...")
-	otpID, err := sendOTP(c, phoneNumber, otpPattern)
-	if err == nil && otpID != "" {
-		requestIDs = append(requestIDs, otpID)
+	otpReqCode, err := sendOTP(c, phoneNumber, otpPattern)
+	if err == nil && otpReqCode != "" {
+		requestCodes = append(requestCodes, otpReqCode)
+	}
+
+	// Test: Get Account Balance
+	if apiKey != "" {
+		fmt.Println("\n💰 Testing GetAccountBalance...")
+		testGetAccountBalance(c)
+	}
+
+	// Test: Get Sending Lines
+	if apiKey != "" {
+		fmt.Println("\n📞 Testing GetSendingLines...")
+		testGetSendingLines(c)
+	}
+
+	// Test: Get Pattern Detail
+	if patternCode != "" && patternCode != "your_pattern_code" {
+		fmt.Println("\n🔍 Testing GetPatternDetail...")
+		testGetPatternDetail(c, patternCode)
+	} else {
+		fmt.Println("\n⚠️ Skipping GetPatternDetail test: pattern code not set.")
 	}
 
 	// Wait a bit for messages to be processed
-	if len(requestIDs) > 0 {
+	if len(requestCodes) > 0 {
 		fmt.Println("\n⏳ Waiting 10 seconds for message processing...")
 		time.Sleep(10 * time.Second)
 
-		// Example 4: Check delivery status
+		// Example 4: Check delivery status for each request code from previous tests
 		fmt.Println("\n📊 Example 4: Checking delivery status...")
-		// You'll need to use an actual request ID here for real testing
-		checkDeliveryStatus(c, 123456) // Default test ID
-
-		// If we have actual request IDs from this run, check those as well
-		for i, id := range requestIDs {
-			if id != "" {
-				fmt.Printf("\nChecking delivery status for request ID from example %d...\n", i+1)
-				// You may need to convert the string ID to an integer based on your API response
-				// For now, this is a placeholder
-				fmt.Printf("⚠️ Request ID: %s - Unable to check (format conversion needed)\n", id)
+		
+		for i, code := range requestCodes {
+			if code != "" {
+				fmt.Printf("\nChecking delivery status for request code from example %d...\n", i+1)
+				checkDeliveryStatus(c, code)
 			}
 		}
+	} else {
+		fmt.Println("\n⚠️ No request codes available for status check. All send operations failed or returned empty codes.")
 	}
 }
 
@@ -163,18 +180,33 @@ func sendRegularSMS(c *client.Client, phoneNumber, sendingNumber string) (string
 	respJSON, _ := json.MarshalIndent(resp, "", "  ")
 	fmt.Printf("📥 Response:\n%s\n", string(respJSON))
 
-	fmt.Printf("✅ SMS sent successfully: Status=%s\n", resp.Status)
+	fmt.Printf("✅ SMS sent successfully. Succeed: %v, Status: %s\n", resp.Data.Succeed, resp.Data.Status)
 
-	// Return the first message ID if available
-	if len(resp.MessageIDs) > 0 {
-		fmt.Printf("📝 Message ID: %s\n", resp.MessageIDs[0])
-		return resp.MessageIDs[0], nil
+	// Return the request code for status checking
+	if resp.Data.RequestCode != "" {
+		fmt.Printf("📝 Request Code: %s\n", resp.Data.RequestCode)
+		
+		// Also print SMS Items IDs if available
+		if len(resp.Data.SmsItems) > 0 {
+			fmt.Println("📱 SMS Items:")
+			for _, item := range resp.Data.SmsItems {
+				fmt.Printf("  - Item ID: %s, Recipient: %s\n", item.SmsItemId, item.Recipient)
+			}
+		}
+		
+		return resp.Data.RequestCode, nil
 	}
 	return "", nil
 }
 
 func sendPatternSMS(c *client.Client, phoneNumber, patternCode string) (string, error) {
 	ctx := context.Background()
+	
+	// Skip if pattern code is clearly a placeholder
+	if patternCode == "your_pattern_code" {
+		fmt.Println("⚠️ Skipping pattern SMS test: using placeholder pattern code")
+		return "", nil
+	}
 
 	// Print request details
 	req := models.PatternRequest{
@@ -202,18 +234,33 @@ func sendPatternSMS(c *client.Client, phoneNumber, patternCode string) (string, 
 	respJSON, _ := json.MarshalIndent(resp, "", "  ")
 	fmt.Printf("📥 Response:\n%s\n", string(respJSON))
 
-	fmt.Printf("✅ Pattern SMS sent successfully: Status=%s\n", resp.Status)
+	fmt.Printf("✅ Pattern SMS sent successfully. Succeed: %v, Status: %s\n", resp.Data.Succeed, resp.Data.Status)
 
-	// Return the first message ID if available
-	if len(resp.MessageIDs) > 0 {
-		fmt.Printf("📝 Message ID: %s\n", resp.MessageIDs[0])
-		return resp.MessageIDs[0], nil
+	// Return the request code for status checking
+	if resp.Data.RequestCode != "" {
+		fmt.Printf("📝 Request Code: %s\n", resp.Data.RequestCode)
+		
+		// Also print SMS Items IDs if available
+		if len(resp.Data.SmsItems) > 0 {
+			fmt.Println("📱 SMS Items:")
+			for _, item := range resp.Data.SmsItems {
+				fmt.Printf("  - Item ID: %s, Recipient: %s\n", item.SmsItemId, item.Recipient)
+			}
+		}
+		
+		return resp.Data.RequestCode, nil
 	}
 	return "", nil
 }
 
 func sendOTP(c *client.Client, phoneNumber, otpPattern string) (string, error) {
 	ctx := context.Background()
+	
+	// Skip if OTP pattern is clearly a placeholder
+	if otpPattern == "your_otp_pattern" {
+		fmt.Println("⚠️ Skipping OTP test: using placeholder OTP pattern code")
+		return "", nil
+	}
 
 	// Generate a random OTP code (in real scenarios, you would generate this securely)
 	otpCode := "123456"
@@ -240,33 +287,86 @@ func sendOTP(c *client.Client, phoneNumber, otpPattern string) (string, error) {
 	respJSON, _ := json.MarshalIndent(resp, "", "  ")
 	fmt.Printf("📥 Response:\n%s\n", string(respJSON))
 
-	fmt.Printf("✅ OTP sent successfully: Status=%s, OTP Code=%s\n", resp.Status, otpCode)
+	fmt.Printf("✅ OTP sent successfully. Succeed: %v, Status: %s, OTP Code: %s\n", 
+		resp.Data.Succeed, resp.Data.Status, otpCode)
 
-	// Return the message ID if available
-	if resp.MessageID != "" {
-		fmt.Printf("📝 Message ID: %s\n", resp.MessageID)
-		return resp.MessageID, nil
+	// Return the request code for status checking
+	if resp.Data.RequestCode != "" {
+		fmt.Printf("📝 Request Code: %s\n", resp.Data.RequestCode)
+		
+		// Also print SMS Items IDs if available
+		if len(resp.Data.SmsItems) > 0 {
+			fmt.Println("📱 SMS Items:")
+			for _, item := range resp.Data.SmsItems {
+				fmt.Printf("  - Item ID: %s, Recipient: %s\n", item.SmsItemId, item.Recipient)
+			}
+		}
+		
+		return resp.Data.RequestCode, nil
 	}
 	return "", nil
 }
 
-func checkDeliveryStatus(c *client.Client, requestID int) {
+func testGetAccountBalance(c *client.Client) {
 	ctx := context.Background()
+	resp, err := c.GetAccountBalance(ctx)
+	if err != nil {
+		fmt.Printf("❌ Failed to get account balance: %v\n", err)
+		printDetailedError(err)
+		return
+	}
+	respJSON, _ := json.MarshalIndent(resp, "", "  ")
+	fmt.Printf("📥 Response:\n%s\n", string(respJSON))
+	fmt.Printf("✅ Account Balance: %d\n", resp.Data.Balance)
+}
 
-	// Print request details
+func testGetSendingLines(c *client.Client) {
+	ctx := context.Background()
+	resp, err := c.GetSendingLines(ctx)
+	if err != nil {
+		fmt.Printf("❌ Failed to get sending lines: %v\n", err)
+		printDetailedError(err)
+		return
+	}
+	respJSON, _ := json.MarshalIndent(resp, "", "  ")
+	fmt.Printf("📥 Response:\n%s\n", string(respJSON))
+	fmt.Println("✅ Sending Line:")
+	fmt.Printf("  - Number: %s, Description: %s, Dedicated: %v, Advertisement: %v, Service: %v, UsableUntil: %s\n",
+		resp.Data.Number, resp.Data.Description, resp.Data.IsDedicated, resp.Data.IsAdvertisement, 
+		resp.Data.IsService, resp.Data.UsableUntil)
+}
+
+func testGetPatternDetail(c *client.Client, patternCode string) {
+	ctx := context.Background()
+	fmt.Printf("🔍 Requesting pattern detail for code: %s\n", patternCode)
+	resp, err := c.GetPatternDetail(ctx, patternCode)
+	if err != nil {
+		fmt.Printf("❌ Failed to get pattern detail: %v\n", err)
+		printDetailedError(err)
+		return
+	}
+	respJSON, _ := json.MarshalIndent(resp, "", "  ")
+	fmt.Printf("📥 Response:\n%s\n", string(respJSON))
+	fmt.Printf("✅ Pattern Title: %s, Usable: %v\n", resp.Data.Title, resp.Data.IsUsable)
+}
+
+func checkDeliveryStatus(c *client.Client, requestIDStr string) {
+	ctx := context.Background()
+	var requestID int
+	_, err := fmt.Sscanf(requestIDStr, "%d", &requestID)
+	if err != nil {
+		fmt.Printf("⚠️ Unable to parse request ID '%s' as int: %v\n", requestIDStr, err)
+		return
+	}
 	fmt.Printf("📤 Checking delivery status for request ID: %d\n", requestID)
-
 	resp, err := c.GetDeliveryStatus(ctx, requestID)
 	if err != nil {
 		fmt.Printf("❌ Failed to check delivery status: %v\n", err)
 		printDetailedError(err)
 		return
 	}
-
-	// Print full response
 	respJSON, _ := json.MarshalIndent(resp, "", "  ")
 	fmt.Printf("📥 Response:\n%s\n", string(respJSON))
-
 	fmt.Printf("✅ Delivery status: %s\n", resp.Data.Status)
 	fmt.Println("📱 SMS Items:")
 	for _, item := range resp.Data.SmsItems {
@@ -285,6 +385,15 @@ func printDetailedError(err error) {
 		// If there are specific API error details, print them
 		if apiErr.Message != "" {
 			fmt.Printf("  - Message: %s\n", apiErr.Message)
+		}
+		if apiErr.Code != "" {
+			fmt.Printf("  - Code: %s\n", apiErr.Code)
+		}
+		if len(apiErr.Errors) > 0 {
+			fmt.Printf("  - Detailed Errors:\n")
+			for _, e := range apiErr.Errors {
+				fmt.Printf("    - %s\n", e)
+			}
 		}
 		return
 	}
