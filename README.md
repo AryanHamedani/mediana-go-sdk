@@ -61,7 +61,7 @@ resp, err := c.SendOTP(context.Background(), models.OTPRequest{
 ### Check Delivery Status
 
 ```go
-resp, err := c.GetDeliveryStatus(context.Background(), requestID)
+resp, err := c.GetDeliveryStatus(context.Background(), "your-request-id-string")
 ```
 
 ## Error Handling

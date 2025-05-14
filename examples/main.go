@@ -352,14 +352,8 @@ func testGetPatternDetail(c *client.Client, patternCode string) {
 
 func checkDeliveryStatus(c *client.Client, requestIDStr string) {
 	ctx := context.Background()
-	var requestID int
-	_, err := fmt.Sscanf(requestIDStr, "%d", &requestID)
-	if err != nil {
-		fmt.Printf("⚠️ Unable to parse request ID '%s' as int: %v\n", requestIDStr, err)
-		return
-	}
-	fmt.Printf("📤 Checking delivery status for request ID: %d\n", requestID)
-	resp, err := c.GetDeliveryStatus(ctx, requestID)
+	fmt.Printf("📤 Checking delivery status for request ID: %s\n", requestIDStr)
+	resp, err := c.GetDeliveryStatus(ctx, requestIDStr)
 	if err != nil {
 		fmt.Printf("❌ Failed to check delivery status: %v\n", err)
 		printDetailedError(err)
