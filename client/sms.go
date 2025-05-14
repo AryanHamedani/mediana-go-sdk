@@ -54,8 +54,8 @@ func (c *Client) SendOTP(ctx context.Context, req models.OTPRequest) (*models.OT
 }
 
 // GetDeliveryStatus retrieves the delivery status of a message by request ID
-func (c *Client) GetDeliveryStatus(ctx context.Context, requestID int) (*models.DeliveryStatusResponse, error) {
-	endpoint := fmt.Sprintf("send-requests/status/%d", requestID)
+func (c *Client) GetDeliveryStatus(ctx context.Context, requestID string) (*models.DeliveryStatusResponse, error) {
+	endpoint := fmt.Sprintf("send-requests/status/%s", requestID)
 	resp, err := c.doRequest(ctx, "GET", endpoint, nil)
 	if err != nil {
 		return nil, err

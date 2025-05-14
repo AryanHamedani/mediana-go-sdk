@@ -1,14 +1,13 @@
-
 openapi: 3.0.0
 info:
-  title: Mediana Customer SMS API 
+  title: Mediana Customer SMS API
   description: |
     Mediana SMS API provides services for sending SMS messages, including OTP, standard SMS, and pattern-based SMS.
-    
+
     ## Authentication
     - API Key authentication is required
     - Include the API key in the Authorization header as: `Bearer YOUR_API_KEY`
-    
+
     ## Error Codes
     | Error Code | Description |
     | --- | --- |
@@ -82,10 +81,9 @@ paths:
                   type: string
                 otpCode:
                   type: string
-               
 
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -124,7 +122,7 @@ paths:
                               type: string
                             recipient:
                               type: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
@@ -190,11 +188,11 @@ paths:
                   type: array
                   items:
                     type: string
-            
+
                 messageText:
                   type: string
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -233,7 +231,7 @@ paths:
                               type: string
                             recipient:
                               type: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
@@ -299,11 +297,11 @@ paths:
                   type: array
                   items:
                     type: string
-            
+
                 messageText:
                   type: string
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -342,7 +340,7 @@ paths:
                               type: string
                             recipient:
                               type: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
@@ -389,7 +387,7 @@ paths:
                               type: string
                             recipient:
                               type: string
-  
+
   /send/pattern:
     post:
       summary: Send Pattern SMS
@@ -413,7 +411,7 @@ paths:
                   additionalProperties:
                     type: string
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -452,7 +450,7 @@ paths:
                               type: string
                             recipient:
                               type: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
@@ -511,7 +509,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -578,7 +576,7 @@ paths:
                       CreateDate:
                         type: string
                         format: date-time
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
@@ -615,9 +613,9 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -640,7 +638,7 @@ paths:
                               type: string
                             status:
                               type: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
@@ -673,7 +671,7 @@ paths:
       description: Retrieve the current balance of the account.
       operationId: getBalance
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -685,7 +683,7 @@ paths:
                     properties:
                       Balance:
                         type: integer
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
@@ -718,7 +716,7 @@ paths:
       description: Retrieve available sending lines for the account.
       operationId: getLines
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -740,7 +738,7 @@ paths:
                         type: boolean
                       UsableUntil:
                         type: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
@@ -780,7 +778,7 @@ paths:
             type: string
             default: New
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -808,7 +806,7 @@ paths:
                         type: string
                       ReceiveDateTime:
                         type: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:

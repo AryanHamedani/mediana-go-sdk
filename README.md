@@ -5,7 +5,7 @@ Go SDK for the Mediana.ir SMS API, providing services for sending SMS messages, 
 ## Installation
 
 ```bash
-go get github.com/AryanHamedani/mediana-go-sdk@v1.1.1
+go get github.com/AryanHamedani/mediana-go-sdk@v1.1.2
 ```
 
 ## Usage
@@ -61,7 +61,7 @@ resp, err := c.SendOTP(context.Background(), models.OTPRequest{
 ### Check Delivery Status
 
 ```go
-resp, err := c.GetDeliveryStatus(context.Background(), requestID)
+resp, err := c.GetDeliveryStatus(context.Background(), "your-request-id-string")
 ```
 
 ## Error Handling
