@@ -8,8 +8,10 @@ import (
 	"strings"
 )
 
-// maxErrorBodyBytes caps how much of an error response body we retain.
-const maxErrorBodyBytes = 2048
+// maxErrorBodyBytes caps how much of an error response body we retain — large
+// enough to hold a full JSON error envelope with multiple detail entries,
+// while still bounding memory against an oversized gateway page.
+const maxErrorBodyBytes = 16 * 1024
 
 type APIError struct {
 	StatusCode int
