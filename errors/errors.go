@@ -3,9 +3,15 @@ package errors
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 )
+
+// maxErrorBodyBytes caps how much of an error response body we retain — large
+// enough to hold a full JSON error envelope with multiple detail entries,
+// while still bounding memory against an oversized gateway page.
+const maxErrorBodyBytes = 16 * 1024
 
 type APIError struct {
 	StatusCode int
@@ -23,23 +29,38 @@ func (e *APIError) Error() string {
 }
 
 func ParseError(resp *http.Response) error {
+	body, readErr := io.ReadAll(io.LimitReader(resp.Body, maxErrorBodyBytes))
+	if readErr != nil {
+		return &APIError{
+			StatusCode: resp.StatusCode,
+			Message:    fmt.Sprintf("failed to read error response body: %v", readErr),
+		}
+	}
+
 	var errorResponse struct {
 		Meta struct {
 			Code         string `json:"code"`
 			ErrorMessage string `json:"errorMessage"`
 			Errors       []struct {
-				Key      string   `json:"key"`
-				Errors   []string `json:"errors"`
+				Key       string   `json:"key"`
+				Errors    []string `json:"errors"`
 				ErrorCode int      `json:"errorCode"`
 			} `json:"errors"`
 		} `json:"meta"`
 		Data map[string]interface{} `json:"data"`
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
+	if err := json.Unmarshal(body, &errorResponse); err != nil {
+		// Body is not the expected JSON envelope (e.g. an HTML/plain-text 429
+		// page from a gateway). Surface the raw body so the failure stays
+		// diagnosable instead of the opaque "failed to parse" message.
+		raw := strings.TrimSpace(string(body))
+		if raw == "" {
+			raw = "(empty body)"
+		}
 		return &APIError{
 			StatusCode: resp.StatusCode,
-			Message:    "failed to parse error response",
+			Message:    fmt.Sprintf("unparseable error response: %s", raw),
 		}
 	}
 
